@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="powerinventoryreorder",
-    version="1.3.0",
+    version="1.4.0",
     packages=find_packages(),
     entry_points={
         "inventree_plugins": [
