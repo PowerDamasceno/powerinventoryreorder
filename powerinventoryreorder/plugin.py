@@ -1,9 +1,9 @@
 from plugin import InvenTreePlugin
-from plugin.mixins import SettingsMixin, ScheduleMixin
+from plugin.mixins import SettingsMixin, ActionMixin
 
 
 class PowerInventoryReorderPlugin(
-    ScheduleMixin,
+    ActionMixin,
     SettingsMixin,
     InvenTreePlugin
 ):
@@ -12,9 +12,11 @@ class PowerInventoryReorderPlugin(
     SLUG = "powerinventoryreorder"
     TITLE = "Power Inventory Reorder"
 
-    VERSION = "1.3.0"
+    VERSION = "1.4.0"
     AUTHOR = "Gabriel Damasceno"
     DESCRIPTION = "Daily reorder report"
+
+    ACTION_NAME = "generate_report"
 
     SETTINGS = {
 
@@ -32,22 +34,11 @@ class PowerInventoryReorderPlugin(
 
     }
 
-    SCHEDULED_TASKS = {
-        "reorder_test": {
-            "func": "run_test",
-            "schedule": "H",
+    def perform_action(self, user=None, data=None):
+        print("Power Inventory Reorder plugin action executed")
+
+    def get_result(self, user=None, data=None):
+        return {
+            "success": True,
+            "message": "Power Inventory Reorder plugin is working"
         }
-    }
-
-    def run_test(self, *args, **kwargs):
-
-        recipient = self.get_setting("RECIPIENT_EMAIL")
-        report_time = self.get_setting("REPORT_HOUR")
-
-        print(
-            f"[PowerInventoryReorder] "
-            f"Recipient={recipient} "
-            f"ReportTime={report_time}"
-        )
-
-        return True
