@@ -1,11 +1,12 @@
 from plugin import InvenTreePlugin
-from plugin.mixins import SettingsMixin
+from plugin.mixins import SettingsMixin, UserInterfaceMixin
 
 from part.models import Part
 
 
 class PowerInventoryReorderPlugin(
     SettingsMixin,
+    UserInterfaceMixin,
     InvenTreePlugin
 ):
 
@@ -13,9 +14,11 @@ class PowerInventoryReorderPlugin(
     SLUG = "powerinventoryreorder"
     TITLE = "Power Inventory Reorder"
 
-    VERSION = "1.6.0"
+    VERSION = "1.7.0"
     AUTHOR = "Gabriel Damasceno"
     DESCRIPTION = "Daily reorder report"
+
+    ADMIN_SOURCE = "ui_settings.js"
 
     SETTINGS = {
 
@@ -35,38 +38,56 @@ class PowerInventoryReorderPlugin(
 
     def get_reorder_threshold(self, part):
 
-        if part.minimum_stock and float(part.minimum_stock) > 0:
-            return float(part.minimum_stock)
+        try:
+            if part.minimum_stock and float(part.minimum_stock) > 0:
+                return float(part.minimum_stock)
+        except Exception:
+            pass
 
         ipn = (part.IPN or "").upper()
 
         if ipn.startswith("IC"):
             return 5
 
-        if ipn.startswith("DIS"):
-            return 10
-
-        if ipn.startswith("TRS"):
-            return 10
-
-        if ipn.startswith("CON"):
-            return 10
-
-        if ipn.startswith("MOS"):
+        if ipn.startswith(("DIS", "TRS", "CON", "MOS")):
             return 10
 
         return 10
 
-    def generate_report(self):
+    def get_admin_context(self):
 
         total_parts = 0
         reorder_parts = 0
 
-        for part in Part.objects.all():
+        try:
 
-            if not part.IPN:
-                continue
+            for part in Part.objects.all():
 
-            total_parts += 1
+                if not part.IPN:
+                    continue
 
-   
+                total_parts += 1
+
+                try:
+                    stock = float(part.total_stock or 0)
+                except Exception:
+                    stock = 0
+
+                threshold = self.get_reorder_threshold(part)
+
+                if stock <= threshold:
+                    reorder_parts += 1
+
+            return {
+                "status": "OK",
+                "total_parts": total_parts,
+                "reorder_parts": reorder_parts,
+            }
+
+        except Exception as exc:
+
+            return {
+                "status": f"ERROR: {exc}",
+                "total_parts": 0,
+                "reorder_parts": 0,
+            }
