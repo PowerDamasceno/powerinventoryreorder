@@ -1,9 +1,10 @@
 from plugin import InvenTreePlugin
-from plugin.mixins import SettingsMixin, ActionMixin
+from plugin.mixins import SettingsMixin
+
+from part.models import Part
 
 
 class PowerInventoryReorderPlugin(
-    ActionMixin,
     SettingsMixin,
     InvenTreePlugin
 ):
@@ -12,11 +13,9 @@ class PowerInventoryReorderPlugin(
     SLUG = "powerinventoryreorder"
     TITLE = "Power Inventory Reorder"
 
-    VERSION = "1.4.0"
+    VERSION = "1.5.0"
     AUTHOR = "Gabriel Damasceno"
     DESCRIPTION = "Daily reorder report"
-
-    ACTION_NAME = "generate_report"
 
     SETTINGS = {
 
@@ -34,11 +33,51 @@ class PowerInventoryReorderPlugin(
 
     }
 
-    def perform_action(self, user=None, data=None):
-        print("Power Inventory Reorder plugin action executed")
+    def get_reorder_threshold(self, part):
 
-    def get_result(self, user=None, data=None):
-        return {
-            "success": True,
-            "message": "Power Inventory Reorder plugin is working"
-        }
+        if part.minimum_stock and float(part.minimum_stock) > 0:
+            return float(part.minimum_stock)
+
+        ipn = (part.IPN or "").upper()
+
+        if ipn.startswith("IC"):
+            return 5
+
+        if ipn.startswith("DIS"):
+            return 10
+
+        if ipn.startswith("TRS"):
+            return 10
+
+        if ipn.startswith("CON"):
+            return 10
+
+        if ipn.startswith("MOS"):
+            return 10
+
+        return 10
+
+    def ready(self):
+
+        total_ipn = 0
+        reorder_count = 0
+
+        for part in Part.objects.all():
+
+            if not part.IPN:
+                continue
+
+            total_ipn += 1
+
+            stock = float(part.total_stock or 0)
+
+            threshold = self.get_reorder_threshold(part)
+
+            if stock <= threshold:
+                reorder_count += 1
+
+        print("")
+        print("[PowerInventoryReorder]")
+        print(f"Parts with IPN: {total_ipn}")
+        print(f"Reorder candidates: {reorder_count}")
+        print("")
