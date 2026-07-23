@@ -13,7 +13,7 @@ class PowerInventoryReorderPlugin(
     SLUG = "powerinventoryreorder"
     TITLE = "Power Inventory Reorder"
 
-    VERSION = "1.5.0"
+    VERSION = "1.6.0"
     AUTHOR = "Gabriel Damasceno"
     DESCRIPTION = "Daily reorder report"
 
@@ -57,27 +57,16 @@ class PowerInventoryReorderPlugin(
 
         return 10
 
-    def ready(self):
+    def generate_report(self):
 
-        total_ipn = 0
-        reorder_count = 0
+        total_parts = 0
+        reorder_parts = 0
 
         for part in Part.objects.all():
 
             if not part.IPN:
                 continue
 
-            total_ipn += 1
+            total_parts += 1
 
-            stock = float(part.total_stock or 0)
-
-            threshold = self.get_reorder_threshold(part)
-
-            if stock <= threshold:
-                reorder_count += 1
-
-        print("")
-        print("[PowerInventoryReorder]")
-        print(f"Parts with IPN: {total_ipn}")
-        print(f"Reorder candidates: {reorder_count}")
-        print("")
+   
