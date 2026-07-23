@@ -8,14 +8,22 @@ class PowerInventoryReorderPlugin(SettingsMixin, InvenTreePlugin):
     SLUG = "powerinventoryreorder"
     TITLE = "Power Inventory Reorder"
 
-    VERSION = "1.1.0"
+    VERSION = "1.2.0"
     AUTHOR = "Gabriel Damasceno"
     DESCRIPTION = "Daily reorder report"
 
     SETTINGS = {
+
         "RECIPIENT_EMAIL": {
             "name": "Recipient Email",
             "description": "Email recipient for reorder reports",
             "default": "gabriel.damasceno@powersoft.com",
-        }
+        },
+
+        "REPORT_HOUR": {
+            "name": "Report Time",
+            "description": "Daily report time (HH:MM)",
+            "default": "16:30",
+        },
+
     }
