@@ -14,7 +14,7 @@ class PowerInventoryReorderPlugin(
     SLUG = "powerinventoryreorder"
     TITLE = "Power Inventory Reorder"
 
-    VERSION = "1.8.0"
+    VERSION = "1.9.0"
     AUTHOR = "Gabriel Damasceno"
     DESCRIPTION = "Daily reorder report"
 
@@ -33,7 +33,6 @@ class PowerInventoryReorderPlugin(
             "description": "Daily report time (HH:MM)",
             "default": "16:30",
         },
-
     }
 
     def get_reorder_threshold(self, part):
@@ -81,23 +80,27 @@ class PowerInventoryReorderPlugin(
 
                     reorder_parts += 1
 
+                    missing = max(0, threshold - stock)
+
                     reorder_list.append({
                         "ipn": part.IPN,
                         "name": part.name,
                         "stock": stock,
                         "threshold": threshold,
+                        "missing": missing,
                     })
 
             reorder_list = sorted(
                 reorder_list,
-                key=lambda x: x["stock"]
+                key=lambda x: x["missing"],
+                reverse=True
             )
 
             return {
                 "status": "OK",
                 "total_parts": total_parts,
                 "reorder_parts": reorder_parts,
-                "reorder_list": reorder_list[:50],
+                "reorder_list": reorder_list[:100],
             }
 
         except Exception as exc:
