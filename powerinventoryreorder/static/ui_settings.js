@@ -39,11 +39,9 @@ export function renderPluginSettings(target, data) {
         <hr>
 
         <p>
-            .1.74/plugin/powerinventoryreorder/export/"
-               class="btn btn-primary">
-                Download CSV
-            </a>
-        </p>
+    <a href="http://10.151.1.74/plugin/powerinventoryreorder/export Download CSV
+    </a>
+</p>
 
         <hr>
 
