@@ -38,22 +38,13 @@ export function renderPluginSettings(target, data) {
 
         <hr>
 
-        <p>
-    http://10.151.1.74/plugin/powerinventoryreorder/export/"
-       style="display:inline-block;padding:8px 12px;background:#007bff;color:white;text-decoration:none;border-radius:4px;">
-        Download CSV
-    </a>
-</p>
+        <button id="powerinventory-download-csv">
+            Download CSV
+        </button>
 
         <hr>
 
-<button onclick="window.location='http://10.151.1.74/plugin/powerinventoryreorder/export/'">
-Download CSV
-</button>
-
-<hr>
-
-<h3>Reorder List</h3>
+        <h3>Reorder List</h3>
 
         <table style="width:100%; border-collapse:collapse;">
             <thead>
@@ -72,4 +63,13 @@ Download CSV
 
     </div>
     `;
+
+    const btn = document.getElementById("powerinventory-download-csv");
+
+    if (btn) {
+        btn.onclick = function () {
+            window.location.href =
+                "http://10.151.1.74/plugin/powerinventoryreorder/export/";
+        };
+    }
 }
