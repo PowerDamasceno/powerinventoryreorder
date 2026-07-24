@@ -1,6 +1,8 @@
 export function renderPluginSettings(target, data) {
 
-    let rows = .context.reorder_list.forEach(item => {
+    let rows = "";
+
+    data.context.reorder_list.forEach(item => {
 
         let color = "white";
 
@@ -32,11 +34,8 @@ export function renderPluginSettings(target, data) {
         <hr>
 
         <p><b>Total Parts:</b> ${data.context.total_parts}</p>
-
         <p><b>Reorder Candidates:</b> ${data.context.reorder_parts}</p>
-
         <p><b>Stock Zero:</b> ${data.context.stock_zero}</p>
-
         <p><b>Critical:</b> ${data.context.critical}</p>
 
         <hr>
@@ -61,7 +60,6 @@ export function renderPluginSettings(target, data) {
         <h3>Reorder List</h3>
 
         <table style="width:100%; border-collapse:collapse;">
-
             <thead>
                 <tr>
                     <th>IPN</th>
@@ -76,7 +74,6 @@ export function renderPluginSettings(target, data) {
             <tbody>
                 ${rows}
             </tbody>
-
         </table>
 
     </div>
