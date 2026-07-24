@@ -45,7 +45,9 @@ export function renderPluginSettings(target, data) {
         <hr>
 
         <p>
-            /plugin/powerinventoryreorder/export/
+            inventoryreorder/export/" target="_blank">
+                Download CSV
+            </a>
         </p>
 
         <hr>
