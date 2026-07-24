@@ -76,10 +76,7 @@ class PowerInventoryReorderPlugin(
 
                 threshold = self.get_reorder_threshold(part)
 
-                # V2.0:
-                # sotto soglia soltanto,
-                # NON include stock == threshold
-
+                # Solo componenti sotto soglia
                 if stock < threshold:
 
                     reorder_parts += 1
@@ -96,19 +93,20 @@ class PowerInventoryReorderPlugin(
                         "qty_to_order": missing,
                     })
 
-            reorder_list = sorted(
-                reorder_list,
+            reorder_list.sort(
                 key=lambda x: x["missing"],
                 reverse=True
             )
 
-            stock_zero = len(
-                   [x for x in reorder_list if x["stock"] == 0]
-            )
+            stock_zero = len([
+                x for x in reorder_list
+                if x["stock"] == 0
+            ])
 
-            critical = len(
-                      [x for x in reorder_list if x["missing"] >= 5]
-            )
+            critical = len([
+                x for x in reorder_list
+                if x["missing"] >= 5
+            ])
 
             return {
                 "status": "OK",
