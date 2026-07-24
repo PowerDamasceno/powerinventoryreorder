@@ -14,7 +14,7 @@ class PowerInventoryReorderPlugin(
     SLUG = "powerinventoryreorder"
     TITLE = "Power Inventory Reorder"
 
-    VERSION = "1.9.2"
+    VERSION = "2.0.0"
     AUTHOR = "Gabriel Damasceno"
     DESCRIPTION = "Daily reorder report"
 
@@ -76,6 +76,10 @@ class PowerInventoryReorderPlugin(
 
                 threshold = self.get_reorder_threshold(part)
 
+                # V2.0:
+                # sotto soglia soltanto,
+                # NON include stock == threshold
+
                 if stock < threshold:
 
                     reorder_parts += 1
@@ -83,11 +87,13 @@ class PowerInventoryReorderPlugin(
                     missing = threshold - stock
 
                     reorder_list.append({
+                        "id": part.pk,
                         "ipn": part.IPN,
                         "name": part.name,
                         "stock": stock,
                         "threshold": threshold,
                         "missing": missing,
+                        "qty_to_order": missing,
                     })
 
             reorder_list = sorted(
@@ -96,11 +102,21 @@ class PowerInventoryReorderPlugin(
                 reverse=True
             )
 
+            stock_zero = len(
+                [x for x in reorder_list if x["stock"] == 0]
+            )
+
+            critical = len(
+                [x for x in reorder_list if x["stock"] == 0]
+            )
+
             return {
                 "status": "OK",
                 "total_parts": total_parts,
                 "reorder_parts": reorder_parts,
-                "reorder_list": reorder_list[:100],
+                "stock_zero": stock_zero,
+                "critical": critical,
+                "reorder_list": reorder_list,
             }
 
         except Exception as exc:
@@ -109,5 +125,7 @@ class PowerInventoryReorderPlugin(
                 "status": f"ERROR: {exc}",
                 "total_parts": 0,
                 "reorder_parts": 0,
+                "stock_zero": 0,
+                "critical": 0,
                 "reorder_list": [],
             }
