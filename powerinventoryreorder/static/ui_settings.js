@@ -44,13 +44,29 @@ export function renderPluginSettings(target, data) {
 
         <hr>
 
-        <p>
-            <a
-                href="/plugin/powerinventoryreorder/export/"
-                target="_blank"
-                style="
-                    display:inline-block;
-                    padding:10px  <tr>
+        /powerinventoryreorder/export/"
+            target="_blank"
+            style="
+                display:inline-block;
+                padding:10px 20px;
+                background:#228be6;
+                color:white;
+                text-decoration:none;
+                border-radius:4px;
+                font-weight:bold;
+            "
+        >
+            Download CSV
+        </a>
+
+        <hr>
+
+        <h3>Reorder List</h3>
+
+        <table style="width:100%; border-collapse:collapse;">
+
+            <thead>
+                <tr>
                     <th>IPN</th>
                     <th>Name</th>
                     <th>Stock</th>
