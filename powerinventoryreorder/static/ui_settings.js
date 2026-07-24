@@ -44,9 +44,16 @@ export function renderPluginSettings(target, data) {
 
         <hr>
 
+        <p>
+            /plugin/powerinventoryreorder/export/
+        </p>
+
+        <hr>
+
         <h3>Reorder List</h3>
 
         <table style="width:100%; border-collapse:collapse;">
+
             <thead>
                 <tr>
                     <th>IPN</th>
@@ -61,6 +68,7 @@ export function renderPluginSettings(target, data) {
             <tbody>
                 ${rows}
             </tbody>
+
         </table>
 
     </div>
