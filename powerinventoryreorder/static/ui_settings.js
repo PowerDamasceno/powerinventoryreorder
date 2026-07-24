@@ -45,19 +45,12 @@ export function renderPluginSettings(target, data) {
         <hr>
 
         <p>
-            inventoryreorder/export/" target="_blank">
-                Download CSV
-            </a>
-        </p>
-
-        <hr>
-
-        <h3>Reorder List</h3>
-
-        <table style="width:100%; border-collapse:collapse;">
-
-            <thead>
-                <tr>
+            <a
+                href="/plugin/powerinventoryreorder/export/"
+                target="_blank"
+                style="
+                    display:inline-block;
+                    padding:10px  <tr>
                     <th>IPN</th>
                     <th>Name</th>
                     <th>Stock</th>
