@@ -7,13 +7,8 @@ export function renderPluginSettings(target, data) {
         let color = "white";
 
         if (item.stock === 0) {
-
             color = "#ffe5e5";
-
-        }
-
-        else if (item.missing >= 5) {
-
+        } else if (item.missing >= 5) {
             color = "#fff4d6";
         }
 
@@ -34,48 +29,18 @@ export function renderPluginSettings(target, data) {
 
         <h2>Power Inventory Reorder</h2>
 
-        <p>
-            <b>Status:</b>
-            ${data.context.status}
-        </p>
+        <p><b>Status:</b> ${data.context.status}</p>
 
         <hr>
 
-        <p>
-            <b>Total Parts:</b>
-            ${data.context.total_parts}
-        </p>
-
-        <p>
-            <b>Reorder Candidates:</b>
-            ${data.context.reorder_parts}
-        </p>
-
-        <p>
-            <b>Stock Zero:</b>
-            ${data.context.stock_zero}
-        </p>
-
-        <p>
-            <b>Critical:</b>
-            ${data.context.critical}
-        </p>
+        <p><b>Total Parts:</b> ${data.context.total_parts}</p>
+        <p><b>Reorder Candidates:</b> ${data.context.reorder_parts}</p>
+        <p><b>Stock Zero:</b> ${data.context.stock_zero}</p>
+        <p><b>Critical:</b> ${data.context.critical}</p>
 
         <hr>
 
-        <a
-            href="/plugin/powerinventoryreorder/export/"
-            target="_blank"
-            style="
-                display:inline-block;
-                padding:10px 20px;
-                background:#228be6;
-                color:white;
-                text-decoration:none;
-                border-radius:4px;
-                font-weight:bold;
-            "
-        >
+        /plugin/powerinventoryreorder/export/
             Download CSV
         </a>
 
@@ -83,9 +48,21 @@ export function renderPluginSettings(target, data) {
 
         <h3>Reorder List</h3>
 
-        <table style="width:{rows}
-            </tbody>
+        <table style="width:100%; border-collapse:collapse;">
+            <thead>
+                <tr>
+                    <th>IPN</th>
+                    <th>Name</th>
+                    <th>Stock</th>
+                    <th>Threshold</th>
+                    <th>Missing</th>
+                    <th>Qty To Order</th>
+                </tr>
+            </thead>
 
+            <tbody>
+                ${rows}
+            </tbody>
         </table>
 
     </div>
