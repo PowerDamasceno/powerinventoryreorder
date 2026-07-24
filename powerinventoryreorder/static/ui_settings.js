@@ -4,12 +4,18 @@ export function renderPluginSettings(target, data) {
 
     data.context.reorder_list.forEach(item => {
 
+        const color =
+            item.missing >= 10 ? "#ffe5e5" :
+            item.missing >= 5 ? "#fff4d6" :
+            "white";
+
         rows += `
-            <tr>
+            <tr style="background:${color}">
                 <td>${item.ipn}</td>
                 <td>${item.name}</td>
                 <td>${item.stock}</td>
                 <td>${item.threshold}</td>
+                <td>${item.missing}</td>
             </tr>
         `;
     });
@@ -36,15 +42,16 @@ export function renderPluginSettings(target, data) {
 
             <hr>
 
-            <h4>Top 50 Reorder Candidates</h4>
+            <h4>Top 100 Reorder Candidates</h4>
 
             <table style="width:100%; border-collapse:collapse;">
                 <thead>
                     <tr>
-                        <th style="text-align:left;">IPN</th>
-                        <th style="text-align:left;">Name</th>
-                        <th style="text-align:left;">Stock</th>
-                        <th style="text-align:left;">Threshold</th>
+                        <th>IPN</th>
+                        <th>Name</th>
+                        <th>Stock</th>
+                        <th>Threshold</th>
+                        <th>Missing Qty</th>
                     </tr>
                 </thead>
 
