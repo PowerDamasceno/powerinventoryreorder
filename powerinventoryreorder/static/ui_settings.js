@@ -24,10 +24,7 @@ export function renderPluginSettings(target, data) {
         rows += `
         <tr style="background:${color}">
             <td>
-                }/details" target="_blank">
-                    ${item.ipn}
-                </a>
-            </td>
+    <a href="/web/part/${item.id}/details
 
             <td>${item.name}</td>
             <td>${item.stock}</td>
