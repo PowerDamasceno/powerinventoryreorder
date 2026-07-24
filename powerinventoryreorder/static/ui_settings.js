@@ -6,73 +6,94 @@ export function renderPluginSettings(target, data) {
 
         let color = "white";
 
-if (item.stock === 0) {
+        // STOCK ZERO = ROSSO
 
-    color = "#ffe5e5";
+        if (item.stock === 0) {
 
-}
-else if (item.missing >= 10) {
+            color = "#ffe5e5";
 
-    color = "#ffe5e5";
+        }
 
-}
-else if (item.missing >= 5) {
+        // CRITICO MA NON ZERO = GIALLO
 
-    color = "#fff4d6";
+        else if (item.missing >= 5) {
 
-}
+            color = "#fff4d6";
+        }
 
         rows += `
-            <tr style="background:${color}">
-                <td>${item.ipn}</td>
-                <td>${item.name}</td>
-                <td>${item.stock}</td>
-                <td>${item.threshold}</td>
-                <td>${item.missing}</td>
-            </tr>
+        <tr style="background:${color}">
+            <td>
+                }/details" target="_blank">
+                    ${item.ipn}
+                </a>
+            </td>
+
+            <td>${item.name}</td>
+            <td>${item.stock}</td>
+            <td>${item.threshold}</td>
+            <td>${item.missing}</td>
+            <td>${item.qty_to_order}</td>
+        </tr>
         `;
     });
 
     target.innerHTML = `
-        <div style="padding:20px">
 
-            <h3>Power Inventory Reorder</h3>
+    <div style="padding:20px">
 
-            <p>
-                <strong>Status:</strong>
-                ${data.context.status}
-            </p>
+        <h2>Power Inventory Reorder</h2>
 
-            <p>
-                <strong>Parts with IPN:</strong>
-                ${data.context.total_parts}
-            </p>
+        <p>
+            <b>Status:</b>
+            ${data.context.status}
+        </p>
 
-            <p>
-                <strong>Reorder candidates:</strong>
-                ${data.context.reorder_parts}
-            </p>
+        <hr>
 
-            <hr>
+        <p>
+            <b>Total Parts:</b>
+            ${data.context.total_parts}
+        </p>
 
-            <h4>Top 100 Reorder Candidates</h4>
+        <p>
+            <b>Reorder Candidates:</b>
+            ${data.context.reorder_parts}
+        </p>
 
-            <table style="width:100%; border-collapse:collapse;">
-                <thead>
-                    <tr>
-                        <th>IPN</th>
-                        <th>Name</th>
-                        <th>Stock</th>
-                        <th>Threshold</th>
-                        <th>Missing Qty</th>
-                    </tr>
-                </thead>
+        <p>
+            <b>Stock Zero:</b>
+            ${data.context.stock_zero}
+        </p>
 
-                <tbody>
-                    ${rows}
-                </tbody>
-            </table>
+        <p>
+            <b>Out Of Stock:</b>
+            ${data.context.critical}
+        </p>
 
-        </div>
+        <hr>
+
+        <h3>Reorder List</h3>
+
+        <table style="width:100%; border-collapse:collapse;">
+
+            <thead>
+                <tr>
+                    <th>IPN</th>
+                    <th>Name</th>
+                    <th>Stock</th>
+                    <th>Threshold</th>
+                    <th>Missing</th>
+                    <th>Qty To Order</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                ${rows}
+            </tbody>
+
+        </table>
+
+    </div>
     `;
 }
