@@ -18,8 +18,6 @@ export function renderPluginSettings(target, data) {
             <td>${item.name}</td>
             <td>${item.stock}</td>
             <td>${item.threshold}</td>
-            <td>${item.missing}</td>
-            <td>${item.qty_to_order}</td>
         </tr>
         `;
     });
@@ -58,10 +56,9 @@ export function renderPluginSettings(target, data) {
 
         <hr>
 
-        <h3>Reorder List</h3>
-
-        <table style="width:100%; border-collapse:              ${rows}
+        <h3>Reorder List
             </tbody>
+
         </table>
 
     </div>
