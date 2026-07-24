@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="powerinventoryreorder",
-    version="1.9.2",
+    version="2.0.0",
     packages=find_packages(),
     include_package_data=True,
     package_data={
