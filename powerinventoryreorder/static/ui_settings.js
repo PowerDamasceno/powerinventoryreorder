@@ -47,7 +47,13 @@ export function renderPluginSettings(target, data) {
 
         <hr>
 
-        <h3>Reorder List</h3>
+<button onclick="window.location='http://10.151.1.74/plugin/powerinventoryreorder/export/'">
+Download CSV
+</button>
+
+<hr>
+
+<h3>Reorder List</h3>
 
         <table style="width:100%; border-collapse:collapse;">
             <thead>
