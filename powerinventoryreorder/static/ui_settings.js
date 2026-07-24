@@ -18,8 +18,6 @@ export function renderPluginSettings(target, data) {
             <td>${item.name}</td>
             <td>${item.stock}</td>
             <td>${item.threshold}</td>
-            <td>${item.missing}</td>
-            <td>${item.qty_to_order}</td>
         </tr>
         `;
     });
@@ -40,9 +38,12 @@ export function renderPluginSettings(target, data) {
 
         <hr>
 
-        /plugin/powerinventoryreorder/export/
-            Download CSV
-        </a>
+        <p>
+            .1.74/plugin/powerinventoryreorder/export/"
+               class="btn btn-primary">
+                Download CSV
+            </a>
+        </p>
 
         <hr>
 
@@ -55,8 +56,6 @@ export function renderPluginSettings(target, data) {
                     <th>Name</th>
                     <th>Stock</th>
                     <th>Threshold</th>
-                    <th>Missing</th>
-                    <th>Qty To Order</th>
                 </tr>
             </thead>
 
