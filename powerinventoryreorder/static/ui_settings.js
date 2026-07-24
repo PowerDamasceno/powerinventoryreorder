@@ -40,7 +40,8 @@ export function renderPluginSettings(target, data) {
 
         <hr>
 
-        owerinventoryreorder/export/"
+        <a
+            href="/plugin/powerinventoryreorder/export/"
             target="_blank"
             style="
                 display:inline-block;
@@ -59,20 +60,7 @@ export function renderPluginSettings(target, data) {
 
         <h3>Reorder List</h3>
 
-        <table style="width:100%; border-collapse:collapse;">
-            <thead>
-                <tr>
-                    <th>IPN</th>
-                    <th>Name</th>
-                    <th>Stock</th>
-                    <th>Threshold</th>
-                    <th>Missing</th>
-                    <th>Qty To Order</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                ${rows}
+        <table style="width:100%; border-collapse:              ${rows}
             </tbody>
         </table>
 
