@@ -1,15 +1,12 @@
 export function renderPluginSettings(target, data) {
 
-    let rows = "";
-
-    data.context.reorder_list.forEach(item => {
+    let rows = .context.reorder_list.forEach(item => {
 
         let color = "white";
 
         if (item.stock === 0) {
             color = "#ffe5e5";
-        }
-        else if (item.missing >= 5) {
+        } else if (item.missing >= 5) {
             color = "#fff4d6";
         }
 
@@ -44,7 +41,7 @@ export function renderPluginSettings(target, data) {
 
         <hr>
 
-        /powerinventoryreorder/export/"
+        owerinventoryreorder/export/"
             target="_blank"
             style="
                 display:inline-block;
