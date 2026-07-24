@@ -14,7 +14,7 @@ class PowerInventoryReorderPlugin(
     SLUG = "powerinventoryreorder"
     TITLE = "Power Inventory Reorder"
 
-    VERSION = "1.7.1"
+    VERSION = "1.8.0"
     AUTHOR = "Gabriel Damasceno"
     DESCRIPTION = "Daily reorder report"
 
@@ -59,6 +59,8 @@ class PowerInventoryReorderPlugin(
         total_parts = 0
         reorder_parts = 0
 
+        reorder_list = []
+
         try:
 
             for part in Part.objects.all():
@@ -76,12 +78,26 @@ class PowerInventoryReorderPlugin(
                 threshold = self.get_reorder_threshold(part)
 
                 if stock <= threshold:
+
                     reorder_parts += 1
+
+                    reorder_list.append({
+                        "ipn": part.IPN,
+                        "name": part.name,
+                        "stock": stock,
+                        "threshold": threshold,
+                    })
+
+            reorder_list = sorted(
+                reorder_list,
+                key=lambda x: x["stock"]
+            )
 
             return {
                 "status": "OK",
                 "total_parts": total_parts,
                 "reorder_parts": reorder_parts,
+                "reorder_list": reorder_list[:50],
             }
 
         except Exception as exc:
@@ -90,4 +106,5 @@ class PowerInventoryReorderPlugin(
                 "status": f"ERROR: {exc}",
                 "total_parts": 0,
                 "reorder_parts": 0,
+                "reorder_list": [],
             }
