@@ -14,7 +14,7 @@ class PowerInventoryReorderPlugin(
     SLUG = "powerinventoryreorder"
     TITLE = "Power Inventory Reorder"
 
-    VERSION = "2.0.1"
+    VERSION = "2.0.2"
     AUTHOR = "Gabriel Damasceno"
     DESCRIPTION = "Daily reorder report"
 
@@ -76,7 +76,6 @@ class PowerInventoryReorderPlugin(
 
                 threshold = self.get_reorder_threshold(part)
 
-                # Solo componenti sotto soglia
                 if stock < threshold:
 
                     reorder_parts += 1
@@ -84,7 +83,6 @@ class PowerInventoryReorderPlugin(
                     missing = threshold - stock
 
                     reorder_list.append({
-                        "id": part.pk,
                         "ipn": part.IPN,
                         "name": part.name,
                         "stock": stock,
@@ -98,15 +96,13 @@ class PowerInventoryReorderPlugin(
                 reverse=True
             )
 
-            stock_zero = len([
-                x for x in reorder_list
-                if x["stock"] == 0
-            ])
+            stock_zero = len(
+                [x for x in reorder_list if x["stock"] == 0]
+            )
 
-            critical = len([
-                x for x in reorder_list
-                if x["missing"] >= 5
-            ])
+            critical = len(
+                [x for x in reorder_list if x["missing"] >= 5]
+            )
 
             return {
                 "status": "OK",
