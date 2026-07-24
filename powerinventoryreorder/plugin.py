@@ -24,7 +24,7 @@ class PowerInventoryReorderPlugin(
     SLUG = "powerinventoryreorder"
     TITLE = "Power Inventory Reorder"
 
-    VERSION = "2.1.0"
+    VERSION = "2.1.2"
     AUTHOR = "Gabriel Damasceno"
     DESCRIPTION = "Daily reorder report"
 
@@ -99,7 +99,7 @@ class PowerInventoryReorderPlugin(
                     "stock": stock,
                     "threshold": threshold,
                     "missing": missing,
-                    "qty_to_order": missing,
+                    "qty_to_order": int(missing),
                 })
 
         reorder_list.sort(
@@ -124,24 +124,36 @@ class PowerInventoryReorderPlugin(
         writer = csv.writer(response)
 
         writer.writerow([
-            "IPN",
-            "Name",
-            "Stock",
-            "Threshold",
-            "Missing",
-            "QtyToOrder",
+            "N. Riga",
+            "Secondo Cod. art.",
+            "Descrizione",
+            "Descrizione Riga 2",
+            "Quantità Ordinata",
+            "UM",
+            "Costo Unit.",
+            "Prezzo Totale",
+            "Data Rich.",
+            "N. disegno tecnico",
         ])
+
+        row_number = 1
 
         for item in reorder_list:
 
             writer.writerow([
-                item["ipn"],
-                item["name"],
-                item["stock"],
-                item["threshold"],
-                item["missing"],
-                item["qty_to_order"],
+                row_number,                  # A
+                item["ipn"],                 # B
+                "",                          # C
+                "",                          # D
+                item["qty_to_order"],        # E
+                "",                          # F
+                "0.01",                      # G
+                "",                          # H
+                "",                          # I
+                "",                          # J
             ])
+
+            row_number += 1
 
         return response
 
