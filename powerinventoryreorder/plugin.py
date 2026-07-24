@@ -14,7 +14,7 @@ class PowerInventoryReorderPlugin(
     SLUG = "powerinventoryreorder"
     TITLE = "Power Inventory Reorder"
 
-    VERSION = "1.9.0"
+    VERSION = "1.9.1"
     AUTHOR = "Gabriel Damasceno"
     DESCRIPTION = "Daily reorder report"
 
@@ -76,11 +76,11 @@ class PowerInventoryReorderPlugin(
 
                 threshold = self.get_reorder_threshold(part)
 
-                if stock <= threshold:
+                if stock < threshold:
 
                     reorder_parts += 1
 
-                    missing = max(0, threshold - stock)
+                    missing = threshold - stock
 
                     reorder_list.append({
                         "ipn": part.IPN,
