@@ -1,6 +1,18 @@
 export function renderPluginSettings(target, data) {
 
-    console.log("PowerInventoryReorder", data);
+    let rows = "";
+
+    data.context.reorder_list.forEach(item => {
+
+        rows += `
+            <tr>
+                <td>${item.ipn}</td>
+                <td>${item.name}</td>
+                <td>${item.stock}</td>
+                <td>${item.threshold}</td>
+            </tr>
+        `;
+    });
 
     target.innerHTML = `
         <div style="padding:20px">
@@ -21,6 +33,25 @@ export function renderPluginSettings(target, data) {
                 <strong>Reorder candidates:</strong>
                 ${data.context.reorder_parts}
             </p>
+
+            <hr>
+
+            <h4>Top 50 Reorder Candidates</h4>
+
+            <table style="width:100%; border-collapse:collapse;">
+                <thead>
+                    <tr>
+                        <th style="text-align:left;">IPN</th>
+                        <th style="text-align:left;">Name</th>
+                        <th style="text-align:left;">Stock</th>
+                        <th style="text-align:left;">Threshold</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    ${rows}
+                </tbody>
+            </table>
 
         </div>
     `;
