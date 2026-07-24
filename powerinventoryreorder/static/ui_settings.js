@@ -4,10 +4,23 @@ export function renderPluginSettings(target, data) {
 
     data.context.reorder_list.forEach(item => {
 
-        const color =
-            item.missing >= 10 ? "#ffe5e5" :
-            item.missing >= 5 ? "#fff4d6" :
-            "white";
+        let color = "white";
+
+if (item.stock === 0) {
+
+    color = "#ffe5e5";
+
+}
+else if (item.missing >= 10) {
+
+    color = "#ffe5e5";
+
+}
+else if (item.missing >= 5) {
+
+    color = "#fff4d6";
+
+}
 
         rows += `
             <tr style="background:${color}">
