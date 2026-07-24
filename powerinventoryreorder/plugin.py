@@ -14,7 +14,7 @@ class PowerInventoryReorderPlugin(
     SLUG = "powerinventoryreorder"
     TITLE = "Power Inventory Reorder"
 
-    VERSION = "2.0.0"
+    VERSION = "2.0.1"
     AUTHOR = "Gabriel Damasceno"
     DESCRIPTION = "Daily reorder report"
 
