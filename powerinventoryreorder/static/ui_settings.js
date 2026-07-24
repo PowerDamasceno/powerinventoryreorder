@@ -14,7 +14,7 @@ export function renderPluginSettings(target, data) {
 
         }
 
-        // CRITICO MA NON ZERO = GIALLO
+        // STOCK BASSO = GIALLO
 
         else if (item.missing >= 5) {
 
@@ -24,7 +24,10 @@ export function renderPluginSettings(target, data) {
         rows += `
         <tr style="background:${color}">
             <td>
-    <a href="/web/part/${item.id}/details
+                /web/part/${item.id}/details
+                    ${item.ipn}
+                </a>
+            </td>
 
             <td>${item.name}</td>
             <td>${item.stock}</td>
@@ -36,7 +39,6 @@ export function renderPluginSettings(target, data) {
     });
 
     target.innerHTML = `
-
     <div style="padding:20px">
 
         <h2>Power Inventory Reorder</h2>
@@ -64,7 +66,7 @@ export function renderPluginSettings(target, data) {
         </p>
 
         <p>
-            <b>Out Of Stock:</b>
+            <b>Critical:</b>
             ${data.context.critical}
         </p>
 
