@@ -1,3 +1,5 @@
+import csv
+
 from django.http import HttpResponse
 from django.urls import path
 
@@ -22,7 +24,7 @@ class PowerInventoryReorderPlugin(
     SLUG = "powerinventoryreorder"
     TITLE = "Power Inventory Reorder"
 
-    VERSION = "2.0.3"
+    VERSION = "2.1.0"
     AUTHOR = "Gabriel Damasceno"
     DESCRIPTION = "Daily reorder report"
 
@@ -43,14 +45,12 @@ class PowerInventoryReorderPlugin(
         },
     }
 
-    def export_test(self, request):
-        return HttpResponse("CSV TEST OK")
-
     def setup_urls(self):
+
         return [
             path(
                 "export/",
-                self.export_test,
+                self.export_csv,
                 name="export",
             )
         ]
@@ -73,47 +73,87 @@ class PowerInventoryReorderPlugin(
 
         return 10
 
-    def get_admin_context(self):
-
-        total_parts = 0
-        reorder_parts = 0
+    def build_reorder_list(self):
 
         reorder_list = []
 
+        for part in Part.objects.all():
+
+            if not part.IPN:
+                continue
+
+            try:
+                stock = float(part.total_stock or 0)
+            except Exception:
+                stock = 0
+
+            threshold = self.get_reorder_threshold(part)
+
+            if stock < threshold:
+
+                missing = threshold - stock
+
+                reorder_list.append({
+                    "ipn": part.IPN,
+                    "name": part.name,
+                    "stock": stock,
+                    "threshold": threshold,
+                    "missing": missing,
+                    "qty_to_order": missing,
+                })
+
+        reorder_list.sort(
+            key=lambda x: x["missing"],
+            reverse=True
+        )
+
+        return reorder_list
+
+    def export_csv(self, request):
+
+        reorder_list = self.build_reorder_list()
+
+        response = HttpResponse(
+            content_type="text/csv"
+        )
+
+        response[
+            "Content-Disposition"
+        ] = 'attachment; filename="reorder_report.csv"'
+
+        writer = csv.writer(response)
+
+        writer.writerow([
+            "IPN",
+            "Name",
+            "Stock",
+            "Threshold",
+            "Missing",
+            "QtyToOrder",
+        ])
+
+        for item in reorder_list:
+
+            writer.writerow([
+                item["ipn"],
+                item["name"],
+                item["stock"],
+                item["threshold"],
+                item["missing"],
+                item["qty_to_order"],
+            ])
+
+        return response
+
+    def get_admin_context(self):
+
         try:
 
-            for part in Part.objects.all():
+            reorder_list = self.build_reorder_list()
 
-                if not part.IPN:
-                    continue
-
-                total_parts += 1
-
-                try:
-                    stock = float(part.total_stock or 0)
-                except Exception:
-                    stock = 0
-
-                threshold = self.get_reorder_threshold(part)
-
-                if stock < threshold:
-
-                    reorder_parts += 1
-
-                    missing = threshold - stock
-
-                    reorder_list.append({
-                        "ipn": part.IPN,
-                        "name": part.name,
-                        "stock": stock,
-                        "threshold": threshold,
-                        "missing": missing,
-                        "qty_to_order": missing,
-                    })
-
-            reorder_list.sort(
-                key=lambda x: x["missing"],
-                reverse=True
+            total_parts = sum(
+                1 for p in Part.objects.all()
+                if p.IPN
             )
 
             stock_zero = len([
@@ -129,7 +169,7 @@ class PowerInventoryReorderPlugin(
             return {
                 "status": "OK",
                 "total_parts": total_parts,
-                "reorder_parts": reorder_parts,
+                "reorder_parts": len(reorder_list),
                 "stock_zero": stock_zero,
                 "critical": critical,
                 "reorder_list": reorder_list,
