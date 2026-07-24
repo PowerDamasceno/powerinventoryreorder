@@ -1,5 +1,12 @@
+from django.http import HttpResponse
+from django.urls import path
+
 from plugin import InvenTreePlugin
-from plugin.mixins import SettingsMixin, UserInterfaceMixin
+from plugin.mixins import (
+    SettingsMixin,
+    UserInterfaceMixin,
+    UrlsMixin,
+)
 
 from part.models import Part
 
@@ -7,6 +14,7 @@ from part.models import Part
 class PowerInventoryReorderPlugin(
     SettingsMixin,
     UserInterfaceMixin,
+    UrlsMixin,
     InvenTreePlugin
 ):
 
@@ -14,7 +22,7 @@ class PowerInventoryReorderPlugin(
     SLUG = "powerinventoryreorder"
     TITLE = "Power Inventory Reorder"
 
-    VERSION = "2.0.2"
+    VERSION = "2.0.3"
     AUTHOR = "Gabriel Damasceno"
     DESCRIPTION = "Daily reorder report"
 
@@ -34,6 +42,18 @@ class PowerInventoryReorderPlugin(
             "default": "16:30",
         },
     }
+
+    def export_test(self, request):
+        return HttpResponse("CSV TEST OK")
+
+    def setup_urls(self):
+        return [
+            path(
+                "export/",
+                self.export_test,
+                name="export",
+            )
+        ]
 
     def get_reorder_threshold(self, part):
 
@@ -96,13 +116,15 @@ class PowerInventoryReorderPlugin(
                 reverse=True
             )
 
-            stock_zero = len(
-                [x for x in reorder_list if x["stock"] == 0]
-            )
+            stock_zero = len([
+                x for x in reorder_list
+                if x["stock"] == 0
+            ])
 
-            critical = len(
-                [x for x in reorder_list if x["missing"] >= 5]
-            )
+            critical = len([
+                x for x in reorder_list
+                if x["missing"] >= 5
+            ])
 
             return {
                 "status": "OK",
