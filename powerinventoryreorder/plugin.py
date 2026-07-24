@@ -103,11 +103,11 @@ class PowerInventoryReorderPlugin(
             )
 
             stock_zero = len(
-                [x for x in reorder_list if x["stock"] == 0]
+                   [x for x in reorder_list if x["stock"] == 0]
             )
 
             critical = len(
-                [x for x in reorder_list if x["stock"] == 0]
+                      [x for x in reorder_list if x["missing"] >= 5]
             )
 
             return {
