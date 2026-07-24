@@ -56,11 +56,7 @@ export function renderPluginSettings(target, data) {
 
         <hr>
 
-        <h3>Reorder List
-            </tbody>
+        <h3>Reorder List</h3>
 
-        </table>
+        <table style="width:100%; border-collapse:collapse;">
 
-    </div>
-    `;
-}
