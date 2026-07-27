@@ -1,5 +1,6 @@
 import csv
 
+from django.core.mail import send_mail
 from django.http import HttpResponse
 from django.urls import path
 
@@ -24,7 +25,7 @@ class PowerInventoryReorderPlugin(
     SLUG = "powerinventoryreorder"
     TITLE = "Power Inventory Reorder"
 
-    VERSION = "2.2"
+    VERSION = "2.2.1"
     AUTHOR = "Gabriel Damasceno"
     DESCRIPTION = "Daily reorder report"
 
@@ -60,7 +61,33 @@ class PowerInventoryReorderPlugin(
         ]
 
     def send_test_email(self, request):
-        return HttpResponse("TEST EMAIL OK")
+
+        try:
+            recipient = self.get_setting("RECIPIENT_EMAIL")
+
+            if not recipient:
+                return HttpResponse(
+                    "TEST EMAIL ERROR: recipient email not configured",
+                    status=500
+                )
+
+            send_mail(
+                subject="Power Inventory Reorder - Test Email",
+                message="TEST EMAIL OK",
+                from_email=None,
+                recipient_list=[recipient],
+                fail_silently=False,
+            )
+
+            return HttpResponse(
+                f"TEST EMAIL SENT TO {recipient}"
+            )
+
+        except Exception as exc:
+            return HttpResponse(
+                f"TEST EMAIL ERROR: {exc}",
+                status=500
+            )
 
     def get_reorder_threshold(self, part):
 
