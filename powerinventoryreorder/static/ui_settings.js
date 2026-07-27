@@ -1,5 +1,16 @@
 export function renderPluginSettings(target, data) {
 
+    console.log("PLUGIN DATA =", data);
+
+    if (!data || !data.context) {
+        target.innerHTML = `
+            <div style="padding:20px;color:red">
+                No plugin context received
+            </div>
+        `;
+        return;
+    }
+
     let rows = "";
 
     data.context.reorder_list.forEach(item => {
@@ -71,7 +82,7 @@ export function renderPluginSettings(target, data) {
     if (btn) {
         btn.onclick = function () {
             window.location.href =
-                "http://10.151.1.74/plugin/powerinventoryreorder/export/";
+                "/plugin/powerinventoryreorder/export/";
         };
     }
 }
