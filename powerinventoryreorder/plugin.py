@@ -24,7 +24,7 @@ class PowerInventoryReorderPlugin(
     SLUG = "powerinventoryreorder"
     TITLE = "Power Inventory Reorder"
 
-    VERSION = "2.2"
+    VERSION = "2.1.3.8"
     AUTHOR = "Gabriel Damasceno"
     DESCRIPTION = "Daily reorder report"
 
@@ -52,13 +52,7 @@ class PowerInventoryReorderPlugin(
                 "export/",
                 self.export_csv,
                 name="export",
-            ),
-
-            path(
-                "send-test/",
-                self.send_test,
-                name="send_test",
-            ),
+            )
         ]
 
     def get_reorder_threshold(self, part):
@@ -147,28 +141,21 @@ class PowerInventoryReorderPlugin(
         for item in reorder_list:
 
             writer.writerow([
-                row_number,
-                item["ipn"],
-                "",
-                "",
-                item["qty_to_order"],
-                "",
-                "0.01",
-                "",
-                "",
-                "",
+                row_number,                  # A
+                item["ipn"],                 # B
+                "",                          # C
+                "",                          # D
+                item["qty_to_order"],        # E
+                "",                          # F
+                "0.01",                      # G
+                "",                          # H
+                "",                          # I
+                "",                          # J
             ])
 
             row_number += 1
 
         return response
-
-    def send_test(self, request):
-
-        return HttpResponse(
-            "TEST EMAIL OK",
-            content_type="text/plain"
-        )
 
     def get_admin_context(self):
 
