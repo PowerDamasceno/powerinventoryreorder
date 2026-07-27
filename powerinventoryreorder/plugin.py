@@ -45,15 +45,21 @@ class PowerInventoryReorderPlugin(
         },
     }
 
-    def setup_urls(self):
+def setup_urls(self):
 
-        return [
-            path(
-                "export/",
-                self.export_csv,
-                name="export",
-            )
-        ]
+    return [
+        path(
+            "export/",
+            self.export_csv,
+            name="export",
+        ),
+
+        path(
+            "send-test/",
+            self.send_test,
+            name="send_test",
+        ),
+    ]
 
     def get_reorder_threshold(self, part):
 
@@ -109,53 +115,61 @@ class PowerInventoryReorderPlugin(
 
         return reorder_list
 
-    def export_csv(self, request):
+def export_csv(self, request):
 
-        reorder_list = self.build_reorder_list()
+    reorder_list = self.build_reorder_list()
 
-        response = HttpResponse(
-            content_type="text/csv"
-        )
+    response = HttpResponse(
+        content_type="text/csv"
+    )
 
-        response[
-            "Content-Disposition"
-        ] = 'attachment; filename="reorder_report.csv"'
+    response[
+        "Content-Disposition"
+    ] = 'attachment; filename="reorder_report.csv"'
 
-        writer = csv.writer(response)
+    writer = csv.writer(response)
+
+    writer.writerow([
+        "N. Riga",
+        "Secondo Cod. art.",
+        "Descrizione",
+        "Descrizione Riga 2",
+        "Quantità Ordinata",
+        "UM",
+        "Costo Unit.",
+        "Prezzo Totale",
+        "Data Rich.",
+        "N. disegno tecnico",
+    ])
+
+    row_number = 1
+
+    for item in reorder_list:
 
         writer.writerow([
-            "N. Riga",
-            "Secondo Cod. art.",
-            "Descrizione",
-            "Descrizione Riga 2",
-            "Quantità Ordinata",
-            "UM",
-            "Costo Unit.",
-            "Prezzo Totale",
-            "Data Rich.",
-            "N. disegno tecnico",
+            row_number,                  # A
+            item["ipn"],                 # B
+            "",                          # C
+            "",                          # D
+            item["qty_to_order"],        # E
+            "",                          # F
+            "0.01",                      # G
+            "",                          # H
+            "",                          # I
+            "",                          # J
         ])
 
-        row_number = 1
+        row_number += 1
 
-        for item in reorder_list:
+    return response
 
-            writer.writerow([
-                row_number,                  # A
-                item["ipn"],                 # B
-                "",                          # C
-                "",                          # D
-                item["qty_to_order"],        # E
-                "",                          # F
-                "0.01",                      # G
-                "",                          # H
-                "",                          # I
-                "",                          # J
-            ])
 
-            row_number += 1
+def send_test(self, request):
 
-        return response
+    return HttpResponse(
+        "TEST EMAIL OK",
+        content_type="text/plain"
+    )
 
     def get_admin_context(self):
 
