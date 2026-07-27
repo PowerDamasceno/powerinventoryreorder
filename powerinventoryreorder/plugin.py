@@ -65,6 +65,14 @@ class PowerInventoryReorderPlugin(
         },
     }
 
+        SCHEDULED_TASKS = {
+        "automatic_reorder_report": {
+            "func": "automatic_reorder_report",
+            "schedule": "I",
+            "minutes": 1,
+        },
+    }
+
     def setup_urls(self):
         return [
             path(
@@ -84,102 +92,105 @@ class PowerInventoryReorderPlugin(
             ),
         ]
 
+    def build_report_email(self):
+
+        recipient = self.get_setting("RECIPIENT_EMAIL")
+
+        if not recipient:
+            raise ValueError("recipient email not configured")
+
+        reorder_list = self.build_reorder_list()
+
+        stock_zero = len([
+            item for item in reorder_list
+            if item["stock"] == 0
+        ])
+
+        critical = len([
+            item for item in reorder_list
+            if item["missing"] >= 5
+        ])
+
+        csv_buffer = StringIO()
+        writer = csv.writer(csv_buffer)
+
+        writer.writerow([
+            "N. Riga",
+            "Secondo Cod. art.",
+            "Descrizione",
+            "Descrizione Riga 2",
+            "Quantità Ordinata",
+            "UM",
+            "Costo Unit.",
+            "Prezzo Totale",
+            "Data Rich.",
+            "N. disegno tecnico",
+        ])
+
+        row_number = 1
+
+        for item in reorder_list:
+            writer.writerow([
+                row_number,
+                item["ipn"],
+                "",
+                "",
+                item["qty_to_order"],
+                "",
+                "0.01",
+                "",
+                "",
+                "",
+            ])
+
+            row_number += 1
+
+        preview_lines = []
+
+        for item in reorder_list[:20]:
+            preview_lines.append(
+                f'- {item["ipn"]} | stock {item["stock"]} | soglia {item["threshold"]} | ordinare {item["qty_to_order"]}'
+            )
+
+        if preview_lines:
+            preview_text = "\n".join(preview_lines)
+        else:
+            preview_text = "Nessun componente da riordinare."
+
+        message_body = (
+            "Power Inventory Reorder Report\n\n"
+            f"Componenti da riordinare: {len(reorder_list)}\n"
+            f"Stock zero: {stock_zero}\n"
+            f"Critici: {critical}\n\n"
+            "Anteprima componenti:\n"
+            f"{preview_text}\n\n"
+            "In allegato trovi il file CSV compatibile con il gestionale.\n"
+        )
+
+        email = EmailMessage(
+            subject="Power Inventory Reorder - Report",
+            body=message_body,
+            from_email=None,
+            to=[recipient],
+        )
+
+        email.attach(
+            "reorder_report.csv",
+            csv_buffer.getvalue(),
+            "text/csv"
+        )
+
+        return email, recipient, len(reorder_list)
+
     def send_test_email(self, request):
 
         try:
-            recipient = self.get_setting("RECIPIENT_EMAIL")
-
-            if not recipient:
-                return HttpResponse(
-                    "REPORT EMAIL ERROR: recipient email not configured",
-                    status=500
-                )
-
-            reorder_list = self.build_reorder_list()
-
-            stock_zero = len([
-                item for item in reorder_list
-                if item["stock"] == 0
-            ])
-
-            critical = len([
-                item for item in reorder_list
-                if item["missing"] >= 5
-            ])
-
-            csv_buffer = StringIO()
-            writer = csv.writer(csv_buffer)
-
-            writer.writerow([
-                "N. Riga",
-                "Secondo Cod. art.",
-                "Descrizione",
-                "Descrizione Riga 2",
-                "Quantità Ordinata",
-                "UM",
-                "Costo Unit.",
-                "Prezzo Totale",
-                "Data Rich.",
-                "N. disegno tecnico",
-            ])
-
-            row_number = 1
-
-            for item in reorder_list:
-                writer.writerow([
-                    row_number,
-                    item["ipn"],
-                    "",
-                    "",
-                    item["qty_to_order"],
-                    "",
-                    "0.01",
-                    "",
-                    "",
-                    "",
-                ])
-
-                row_number += 1
-
-            preview_lines = []
-
-            for item in reorder_list[:20]:
-                preview_lines.append(
-                    f'- {item["ipn"]} | stock {item["stock"]} | soglia {item["threshold"]} | ordinare {item["qty_to_order"]}'
-                )
-
-            if preview_lines:
-                preview_text = "\n".join(preview_lines)
-            else:
-                preview_text = "Nessun componente da riordinare."
-
-            message_body = (
-                "Power Inventory Reorder Report\n\n"
-                f"Componenti da riordinare: {len(reorder_list)}\n"
-                f"Stock zero: {stock_zero}\n"
-                f"Critici: {critical}\n\n"
-                "Anteprima componenti:\n"
-                f"{preview_text}\n\n"
-                "In allegato trovi il file CSV compatibile con il gestionale.\n"
-            )
-
-            email = EmailMessage(
-                subject="Power Inventory Reorder - Report",
-                body=message_body,
-                from_email=None,
-                to=[recipient],
-            )
-
-            email.attach(
-                "reorder_report.csv",
-                csv_buffer.getvalue(),
-                "text/csv"
-            )
+            email, recipient, item_count = self.build_report_email()
 
             email.send(fail_silently=False)
 
             return HttpResponse(
-                f"REPORT EMAIL SENT TO {recipient} - ITEMS: {len(reorder_list)}"
+                f"REPORT EMAIL SENT TO {recipient} - ITEMS: {item_count}"
             )
 
         except Exception as exc:
@@ -187,6 +198,48 @@ class PowerInventoryReorderPlugin(
                 f"REPORT EMAIL ERROR: {exc}",
                 status=500
             )
+
+    def automatic_reorder_report(self, *args, **kwargs):
+
+        try:
+ ***        report_hour = self.get_s***ing(
+                "REPORT_HOU***
+                backup_value="1***0"
+            )
+
+            no*** timezone.localtime()
+          ***oday = now.date().isoformat()
+
+ ***        last_auto_report_date = ***f.get_setting(
+                "***T_AUTO_REPORT_DATE",
+           ***  backup_value=""
+            )
+***          if last_auto_report_da***== today:
+                return***utomatic report already sent tod***
+
+            try:
+             ***target_hour, target_minute = rep***_hour.split(":")
+               ***rget_hour = int(target_hour)
+   ***          target_minute = int(ta***t_minute)
+            except Exc***ion:
+                return f"In***id REPORT_HOUR setting: {report_***r}"
+
+            current_minutes***(now.hour * 60) + now.minute
+   ***      target_minutes = (target_h*** * 60) + target_minute
+
+        *** if current_minutes < target_min***s:
+                return "Autom***c report not due yet"
+
+         ***email, recipient, item_count = s***.build_report_email()
+
+         ***email.send(fail_silently=False)
+***          self.set_setting(
+    ***         "LAST_AUTO_REPORT_DATE"***               today
+           ***
+            return f"Automatic ***ort sent to {recipient} - ITEMS:***tem_count}"
+
+        except Exce***on as exc:
+            return f"***omatic report error: {exc}"
 
     def get_reorder_threshold(self, part):
 
