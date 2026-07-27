@@ -16,15 +16,6 @@ from plugin.mixins import (
 
 from part.models import Part
 
-from plugin import InvenTreePlugin
-from plugin.mixins import (
-    SettingsMixin,
-    UserInterfaceMixin,
-    UrlsMixin,
-)
-
-from part.models import Part
-
 
 class PowerInventoryReorderPlugin(
     ScheduleMixin,
@@ -65,7 +56,7 @@ class PowerInventoryReorderPlugin(
         },
     }
 
-        SCHEDULED_TASKS = {
+    SCHEDULED_TASKS = {
         "automatic_reorder_report": {
             "func": "automatic_reorder_report",
             "schedule": "I",
@@ -202,44 +193,48 @@ class PowerInventoryReorderPlugin(
     def automatic_reorder_report(self, *args, **kwargs):
 
         try:
- ***        report_hour = self.get_s***ing(
-                "REPORT_HOU***
-                backup_value="1***0"
+            report_hour = self.get_setting(
+                "REPORT_HOUR",
+                backup_value="16:30"
             )
 
-            no*** timezone.localtime()
-          ***oday = now.date().isoformat()
+            now = timezone.localtime()
+            today = now.date().isoformat()
 
- ***        last_auto_report_date = ***f.get_setting(
-                "***T_AUTO_REPORT_DATE",
-           ***  backup_value=""
+            last_auto_report_date = self.get_setting(
+                "LAST_AUTO_REPORT_DATE",
+                backup_value=""
             )
-***          if last_auto_report_da***== today:
-                return***utomatic report already sent tod***
+
+            if last_auto_report_date == today:
+                return "Automatic report already sent today"
 
             try:
-             ***target_hour, target_minute = rep***_hour.split(":")
-               ***rget_hour = int(target_hour)
-   ***          target_minute = int(ta***t_minute)
-            except Exc***ion:
-                return f"In***id REPORT_HOUR setting: {report_***r}"
+                target_hour, target_minute = report_hour.split(":")
+                target_hour = int(target_hour)
+                target_minute = int(target_minute)
+            except Exception:
+                return f"Invalid REPORT_HOUR setting: {report_hour}"
 
-            current_minutes***(now.hour * 60) + now.minute
-   ***      target_minutes = (target_h*** * 60) + target_minute
+            current_minutes = (now.hour * 60) + now.minute
+            target_minutes = (target_hour * 60) + target_minute
 
-        *** if current_minutes < target_min***s:
-                return "Autom***c report not due yet"
+            if current_minutes < target_minutes:
+                return "Automatic report not due yet"
 
-         ***email, recipient, item_count = s***.build_report_email()
+            email, recipient, item_count = self.build_report_email()
 
-         ***email.send(fail_silently=False)
-***          self.set_setting(
-    ***         "LAST_AUTO_REPORT_DATE"***               today
-           ***
-            return f"Automatic ***ort sent to {recipient} - ITEMS:***tem_count}"
+            email.send(fail_silently=False)
 
-        except Exce***on as exc:
-            return f"***omatic report error: {exc}"
+            self.set_setting(
+                "LAST_AUTO_REPORT_DATE",
+                today
+            )
+
+            return f"Automatic report sent to {recipient} - ITEMS: {item_count}"
+
+        except Exception as exc:
+            return f"Automatic report error: {exc}"
 
     def get_reorder_threshold(self, part):
 
