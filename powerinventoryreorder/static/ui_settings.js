@@ -42,6 +42,12 @@ export function renderPluginSettings(target, data) {
             Download CSV
         </button>
 
+        <br><br>
+
+        <button id="powerinventory-send-test">
+            📧 Send Test Email
+        </button>
+
         <hr>
 
         <h3>Reorder List</h3>
@@ -64,12 +70,25 @@ export function renderPluginSettings(target, data) {
     </div>
     `;
 
-    const btn = document.getElementById("powerinventory-download-csv");
+    const downloadBtn = document.getElementById(
+        "powerinventory-download-csv"
+    );
 
-    if (btn) {
-        btn.onclick = function () {
+    if (downloadBtn) {
+        downloadBtn.onclick = function () {
             window.location.href =
                 "http://10.151.1.74/plugin/powerinventoryreorder/export/";
+        };
+    }
+
+    const mailBtn = document.getElementById(
+        "powerinventory-send-test"
+    );
+
+    if (mailBtn) {
+        mailBtn.onclick = function () {
+            window.location.href =
+                "http://10.151.1.74/plugin/powerinventoryreorder/send-test/";
         };
     }
 }
