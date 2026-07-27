@@ -29,7 +29,7 @@ class PowerInventoryReorderPlugin(
     SLUG = "powerinventoryreorder"
     TITLE = "Power Inventory Reorder"
 
-    VERSION = "2.2.4"
+    VERSION = "2.2.4.1"
     AUTHOR = "Gabriel Damasceno"
     DESCRIPTION = "Daily reorder report"
 
@@ -52,6 +52,18 @@ class PowerInventoryReorderPlugin(
         "LAST_AUTO_REPORT_DATE": {
             "name": "Last Automatic Report Date",
             "description": "Internal date of last automatic report email",
+            "default": "",
+        },
+
+        "LAST_AUTO_REPORT_CHECK": {
+            "name": "Last Automatic Report Check",
+            "description": "Internal timestamp of last automatic report scheduler check",
+            "default": "",
+        },
+
+        "LAST_AUTO_REPORT_STATUS": {
+            "name": "Last Automatic Report Status",
+            "description": "Internal status of last automatic report scheduler check",
             "default": "",
         },
     }
@@ -193,12 +205,19 @@ class PowerInventoryReorderPlugin(
     def automatic_reorder_report(self, *args, **kwargs):
 
         try:
+            now = timezone.localtime()
+            check_timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
+
+            self.set_setting(
+                "LAST_AUTO_REPORT_CHECK",
+                check_timestamp
+            )
+
             report_hour = self.get_setting(
                 "REPORT_HOUR",
                 backup_value="16:30"
             )
 
-            now = timezone.localtime()
             today = now.date().isoformat()
 
             last_auto_report_date = self.get_setting(
@@ -207,20 +226,35 @@ class PowerInventoryReorderPlugin(
             )
 
             if last_auto_report_date == today:
-                return "Automatic report already sent today"
+                status = f"{check_timestamp} - already sent today"
+                self.set_setting(
+                    "LAST_AUTO_REPORT_STATUS",
+                    status
+                )
+                return status
 
             try:
                 target_hour, target_minute = report_hour.split(":")
                 target_hour = int(target_hour)
                 target_minute = int(target_minute)
             except Exception:
-                return f"Invalid REPORT_HOUR setting: {report_hour}"
+                status = f"{check_timestamp} - invalid REPORT_HOUR setting: {report_hour}"
+                self.set_setting(
+                    "LAST_AUTO_REPORT_STATUS",
+                    status
+                )
+                return status
 
             current_minutes = (now.hour * 60) + now.minute
             target_minutes = (target_hour * 60) + target_minute
 
             if current_minutes < target_minutes:
-                return "Automatic report not due yet"
+                status = f"{check_timestamp} - not due yet, report hour is {report_hour}"
+                self.set_setting(
+                    "LAST_AUTO_REPORT_STATUS",
+                    status
+                )
+                return status
 
             email, recipient, item_count = self.build_report_email()
 
@@ -231,10 +265,33 @@ class PowerInventoryReorderPlugin(
                 today
             )
 
-            return f"Automatic report sent to {recipient} - ITEMS: {item_count}"
+            status = f"{check_timestamp} - automatic report sent to {recipient} - ITEMS: {item_count}"
+
+            self.set_setting(
+                "LAST_AUTO_REPORT_STATUS",
+                status
+            )
+
+            return status
 
         except Exception as exc:
-            return f"Automatic report error: {exc}"
+            try:
+                now = timezone.localtime()
+                check_timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
+            except Exception:
+                check_timestamp = "unknown time"
+
+            status = f"{check_timestamp} - automatic report error: {exc}"
+
+            try:
+                self.set_setting(
+                    "LAST_AUTO_REPORT_STATUS",
+                    status
+                )
+            except Exception:
+                pass
+
+            return status
 
     def get_reorder_threshold(self, part):
 
