@@ -4,6 +4,17 @@ from io import StringIO
 from django.core.mail import EmailMessage
 from django.http import HttpResponse
 from django.urls import path
+from django.utils import timezone
+
+from plugin import InvenTreePlugin
+from plugin.mixins import (
+    ScheduleMixin,
+    SettingsMixin,
+    UserInterfaceMixin,
+    UrlsMixin,
+)
+
+from part.models import Part
 
 from plugin import InvenTreePlugin
 from plugin.mixins import (
@@ -16,6 +27,7 @@ from part.models import Part
 
 
 class PowerInventoryReorderPlugin(
+    ScheduleMixin,
     SettingsMixin,
     UserInterfaceMixin,
     UrlsMixin,
@@ -26,7 +38,7 @@ class PowerInventoryReorderPlugin(
     SLUG = "powerinventoryreorder"
     TITLE = "Power Inventory Reorder"
 
-    VERSION = "2.2.3"
+    VERSION = "2.2.4"
     AUTHOR = "Gabriel Damasceno"
     DESCRIPTION = "Daily reorder report"
 
@@ -44,6 +56,12 @@ class PowerInventoryReorderPlugin(
             "name": "Report Time",
             "description": "Daily report time (HH:MM)",
             "default": "16:30",
+        },
+
+        "LAST_AUTO_REPORT_DATE": {
+            "name": "Last Automatic Report Date",
+            "description": "Internal date of last automatic report email",
+            "default": "",
         },
     }
 
