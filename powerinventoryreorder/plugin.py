@@ -164,7 +164,6 @@ class PowerInventoryReorderPlugin(
                 f"REPORT EMAIL ERROR: {exc}",
                 status=500
             )
-`
 
     def get_reorder_threshold(self, part):
 
