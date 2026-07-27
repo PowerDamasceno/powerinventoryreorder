@@ -45,21 +45,21 @@ class PowerInventoryReorderPlugin(
         },
     }
 
-    def setup_urls(self):
+        def setup_urls(self):
 
-    return [
-        path(
-            "export/",
-            self.export_csv,
-            name="export",
-        ),
+        return [
+            path(
+                "export/",
+                self.export_csv,
+                name="export",
+            ),
 
-        path(
-            "send-test/",
-            self.send_test_email,
-            name="send-test",
-        ),
-    ]
+            path(
+                "send-test/",
+                self.send_test_email,
+                name="send-test",
+            ),
+        ]
 
     def get_reorder_threshold(self, part):
 
@@ -115,7 +115,7 @@ class PowerInventoryReorderPlugin(
 
         return reorder_list
 
-        def export_csv(self, request):
+    def export_csv(self, request):
 
         reorder_list = self.build_reorder_list()
 
