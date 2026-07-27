@@ -1,14 +1,5 @@
 export function renderPluginSettings(target, data) {
 
-    console.log("PLUGIN DATA =", data);
-
-    target.innerHTML = `
-        <pre>${JSON.stringify(data, null, 2)}</pre>
-    `;
-
-    return;
-}
-
     let rows = "";
 
     data.context.reorder_list.forEach(item => {
@@ -80,7 +71,7 @@ export function renderPluginSettings(target, data) {
     if (btn) {
         btn.onclick = function () {
             window.location.href =
-                "/plugin/powerinventoryreorder/export/";
+                "http://10.151.1.74/plugin/powerinventoryreorder/export/";
         };
     }
 }
