@@ -24,7 +24,7 @@ class PowerInventoryReorderPlugin(
     SLUG = "powerinventoryreorder"
     TITLE = "Power Inventory Reorder"
 
-    VERSION = "2.1.3.8"
+    VERSION = "2.2"
     AUTHOR = "Gabriel Damasceno"
     DESCRIPTION = "Daily reorder report"
 
@@ -46,14 +46,21 @@ class PowerInventoryReorderPlugin(
     }
 
     def setup_urls(self):
-
         return [
             path(
                 "export/",
                 self.export_csv,
                 name="export",
-            )
+            ),
+            path(
+                "send-test/",
+                self.send_test_email,
+                name="send-test",
+            ),
         ]
+
+    def send_test_email(self, request):
+        return HttpResponse("TEST EMAIL OK")
 
     def get_reorder_threshold(self, part):
 
