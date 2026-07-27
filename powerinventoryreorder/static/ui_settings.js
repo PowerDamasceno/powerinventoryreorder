@@ -2,14 +2,12 @@ export function renderPluginSettings(target, data) {
 
     console.log("PLUGIN DATA =", data);
 
-    if (!data || !data.context) {
-        target.innerHTML = `
-            <div style="padding:20px;color:red">
-                No plugin context received
-            </div>
-        `;
-        return;
-    }
+    target.innerHTML = `
+        <pre>${JSON.stringify(data, null, 2)}</pre>
+    `;
+
+    return;
+}
 
     let rows = "";
 
