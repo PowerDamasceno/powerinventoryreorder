@@ -42,6 +42,10 @@ export function renderPluginSettings(target, data) {
             Download CSV
         </button>
 
+        <button id="powerinventory-send-report-email">
+            Send Report Email
+        </button>
+
         <hr>
 
         <h3>Reorder List</h3>
@@ -72,6 +76,17 @@ export function renderPluginSettings(target, data) {
         btn.onclick = function () {
             window.location.href =
                 "http://10.151.1.74/plugin/powerinventoryreorder/export/";
+        };
+    }
+
+    const emailBtn = document.getElementById(
+        "powerinventory-send-report-email"
+    );
+
+    if (emailBtn) {
+        emailBtn.onclick = function () {
+            window.location.href =
+                "http://10.151.1.74/plugin/powerinventoryreorder/send-report/";
         };
     }
 }
