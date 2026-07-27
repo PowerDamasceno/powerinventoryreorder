@@ -1,6 +1,7 @@
 import csv
+from io import StringIO
 
-from django.core.mail import send_mail
+from django.core.mail import EmailMessage
 from django.http import HttpResponse
 from django.urls import path
 
@@ -25,7 +26,7 @@ class PowerInventoryReorderPlugin(
     SLUG = "powerinventoryreorder"
     TITLE = "Power Inventory Reorder"
 
-    VERSION = "2.2.1"
+    VERSION = "2.2.2"
     AUTHOR = "Gabriel Damasceno"
     DESCRIPTION = "Daily reorder report"
 
@@ -67,27 +68,103 @@ class PowerInventoryReorderPlugin(
 
             if not recipient:
                 return HttpResponse(
-                    "TEST EMAIL ERROR: recipient email not configured",
+                    "REPORT EMAIL ERROR: recipient email not configured",
                     status=500
                 )
 
-            send_mail(
-                subject="Power Inventory Reorder - Test Email",
-                message="TEST EMAIL OK",
-                from_email=None,
-                recipient_list=[recipient],
-                fail_silently=False,
+            reorder_list = self.build_reorder_list()
+
+            stock_zero = len([
+                item for item in reorder_list
+                if item["stock"] == 0
+            ])
+
+            critical = len([
+                item for item in reorder_list
+                if item["missing"] >= 5
+            ])
+
+            csv_buffer = StringIO()
+            writer = csv.writer(csv_buffer)
+
+            writer.writerow([
+                "N. Riga",
+                "Secondo Cod. art.",
+                "Descrizione",
+                "Descrizione Riga 2",
+                "Quantità Ordinata",
+                "UM",
+                "Costo Unit.",
+                "Prezzo Totale",
+                "Data Rich.",
+                "N. disegno tecnico",
+            ])
+
+            row_number = 1
+
+            for item in reorder_list:
+                writer.writerow([
+                    row_number,
+                    item["ipn"],
+                    "",
+                    "",
+                    item["qty_to_order"],
+                    "",
+                    "0.01",
+                    "",
+                    "",
+                    "",
+                ])
+
+                row_number += 1
+
+            preview_lines = []
+
+            for item in reorder_list[:20]:
+                preview_lines.append(
+                    f'- {item["ipn"]} | stock {item["stock"]} | soglia {item["threshold"]} | ordinare {item["qty_to_order"]}'
+                )
+
+            if preview_lines:
+                preview_text = "\n".join(preview_lines)
+            else:
+                preview_text = "Nessun componente da riordinare."
+
+            message_body = (
+                "Power Inventory Reorder Report\n\n"
+                f"Componenti da riordinare: {len(reorder_list)}\n"
+                f"Stock zero: {stock_zero}\n"
+                f"Critici: {critical}\n\n"
+                "Anteprima componenti:\n"
+                f"{preview_text}\n\n"
+                "In allegato trovi il file CSV compatibile con il gestionale.\n"
             )
 
+            email = EmailMessage(
+                subject="Power Inventory Reorder - Report",
+                body=message_body,
+                from_email=None,
+                to=[recipient],
+            )
+
+            email.attach(
+                "reorder_report.csv",
+                csv_buffer.getvalue(),
+                "text/csv"
+            )
+
+            email.send(fail_silently=False)
+
             return HttpResponse(
-                f"TEST EMAIL SENT TO {recipient}"
+                f"REPORT EMAIL SENT TO {recipient} - ITEMS: {len(reorder_list)}"
             )
 
         except Exception as exc:
             return HttpResponse(
-                f"TEST EMAIL ERROR: {exc}",
+                f"REPORT EMAIL ERROR: {exc}",
                 status=500
             )
+`
 
     def get_reorder_threshold(self, part):
 
