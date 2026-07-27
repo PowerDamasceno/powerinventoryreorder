@@ -26,7 +26,7 @@ class PowerInventoryReorderPlugin(
     SLUG = "powerinventoryreorder"
     TITLE = "Power Inventory Reorder"
 
-    VERSION = "2.2.2.1"
+    VERSION = "2.2.3"
     AUTHOR = "Gabriel Damasceno"
     DESCRIPTION = "Daily reorder report"
 
@@ -58,6 +58,11 @@ class PowerInventoryReorderPlugin(
                 "send-test/",
                 self.send_test_email,
                 name="send-test",
+            ),
+            path(
+                "send-report/",
+                self.send_test_email,
+                name="send-report",
             ),
         ]
 
