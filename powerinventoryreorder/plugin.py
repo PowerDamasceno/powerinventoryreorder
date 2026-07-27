@@ -1,5 +1,6 @@
 import csv
 from io import StringIO
+from zoneinfo import ZoneInfo
 
 from django.core.mail import EmailMessage
 from django.http import HttpResponse
@@ -29,7 +30,7 @@ class PowerInventoryReorderPlugin(
     SLUG = "powerinventoryreorder"
     TITLE = "Power Inventory Reorder"
 
-    VERSION = "2.2.4.1"
+    VERSION = "2.2.4.2"
     AUTHOR = "Gabriel Damasceno"
     DESCRIPTION = "Daily reorder report"
 
@@ -205,7 +206,8 @@ class PowerInventoryReorderPlugin(
     def automatic_reorder_report(self, *args, **kwargs):
 
         try:
-            now = timezone.localtime()
+            rome_tz = ZoneInfo("Europe/Rome")
+            now = timezone.now().astimezone(rome_tz)
             check_timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
 
             self.set_setting(
@@ -276,7 +278,8 @@ class PowerInventoryReorderPlugin(
 
         except Exception as exc:
             try:
-                now = timezone.localtime()
+                rome_tz = ZoneInfo("Europe/Rome")
+                now = timezone.now().astimezone(rome_tz)
                 check_timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
             except Exception:
                 check_timestamp = "unknown time"
@@ -435,3 +438,4 @@ class PowerInventoryReorderPlugin(
                 "critical": 0,
                 "reorder_list": [],
             }
+        
